@@ -6,7 +6,7 @@ connect = mysql.connector.connect(
     password="password",
     database="hrt_sub")
 
-cursor = connect.cursor()
+cursor = connect.cursor(buffered=True)
 INSERT_PROG_SQL = "INSERT INTO programs (lang, src, exec) VALUES (%s, %s, %s)"
 GET_ID_LIST_SQL = "SELECT id FROM programs"
 GET_LAST_ID_SQL = "SELECT LAST_INSERT_ID() from programs;"
