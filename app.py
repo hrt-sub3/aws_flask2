@@ -2,6 +2,8 @@ from flask import Flask, request
 import subprocess
 import base64
 import data_source
+from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -12,8 +14,12 @@ def index():
 @app.route("/programs", methods=['GET', 'POST'])
 def programs():
   if request.method == 'POST':
-    src = base64.b64encode(request.form["text"].encode())
-    return str(data_source.insert_program("python", src, None))
+    text = request.form["text"].split('\n')
+    lang, src = text[0], "\n".join(text[1:])
+    if lang == 'python':
+      return str(data_source.insert_program(lang, src, None))
+    else:
+      return 'invalid language'
 
   elif request.method == 'GET':
     return ','.join(map(lambda x: str(x), data_source.get_id_list()))
@@ -21,22 +27,22 @@ def programs():
 
 @app.route("/src", methods=['POST'])
 def show_src():
-  enc_src = data_source.get_src(request.form["text"].encode())
-  src = base64.b64decode(enc_src).decode('UTF-8', 'replace')
-
-  return src
+  return data_source.get_src(request.form["text"])
 
 @app.route("/exec", methods=['POST'])
 def show_exec():
-  enc_src = data_source.get_src(request.form["text"].encode())
-  src = base64.b64decode(enc_src).decode('UTF-8', 'replace')
-  with open("/tmp/tmp.py", "w") as f:
+  src = data_source.get_src(request.form["text"])
+  dt = datetime.now().strftime('%Y%m%d_%H%M%S')
+  path = "/tmp/{}.py".format(dt)
+  with open(path, "w") as f:
     f.write(src)
-  return subprocess.Popen("python /tmp/tmp.py", shell=True, stdout=subprocess.PIPE).communicate()
+  result = subprocess.Popen("python {}".format(path), shell=True, stdout=subprocess.PIPE).communicate()
+  os.remove(path)
+  return result
 
 @app.route("/delete", methods=['POST'])
 def delete():
-  data_source.delete_program(request.form["text"].encode())
+  data_source.delete_program(request.form["text"])
   return "delete ok"
 
 if __name__ == "__main__":
