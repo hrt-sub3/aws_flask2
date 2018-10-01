@@ -19,7 +19,6 @@ DELETE_PROG_SQL = "DELETE FROM programs WHERE id = %s;"
 
 
 def init_cursor():
-    cursor = connector.cursor()
     cursor.execute("USE hrt_sub")
     connect.commit()
 
@@ -48,8 +47,6 @@ def get_program(id):
 def get_src(id):
     cursor.execute(GET_SRC_SQL, (id,))
     row = cursor.fetchone()
-    print(row)
-    print(type(row))
     return row[0]
 
 def get_exec(id):
