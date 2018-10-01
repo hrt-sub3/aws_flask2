@@ -14,8 +14,8 @@ def index():
 @app.route("/programs", methods=['GET', 'POST'])
 def programs():
   if request.method == 'POST':
-    text = request.form["text"].split('\n')
-    lang, src = text[0], "\n".join(text[1:])
+    text = request.form["text"].split('\r\n')
+    lang, src = text[0], "\r\n".join(text[1:])
     if lang == 'python':
       return str(data_source.insert_program(lang, src, None))
     else:

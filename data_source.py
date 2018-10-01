@@ -4,7 +4,8 @@ connect = mysql.connector.connect(
     host="localhost",
     user="flask",
     password="password",
-    database="hrt_sub")
+    database="hrt_sub",
+    charset="utf8")
 
 cursor = connect.cursor(buffered=True)
 INSERT_PROG_SQL = "INSERT INTO programs (lang, src, exec) VALUES (%s, %s, %s)"
@@ -18,6 +19,7 @@ DELETE_PROG_SQL = "DELETE FROM programs WHERE id = %s;"
 
 
 def init_cursor():
+    cursor = connector.cursor()
     cursor.execute("USE hrt_sub")
     connect.commit()
 
@@ -46,6 +48,8 @@ def get_program(id):
 def get_src(id):
     cursor.execute(GET_SRC_SQL, (id,))
     row = cursor.fetchone()
+    print(row)
+    print(type(row))
     return row[0]
 
 def get_exec(id):
